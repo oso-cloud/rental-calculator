@@ -1,5 +1,5 @@
 // Caches the app so it opens offline after the first visit.
-const CACHE = "rental-calc-v1";
+const CACHE = "rental-calc-v2";
 const FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png"];
 
 self.addEventListener("install", e => {
