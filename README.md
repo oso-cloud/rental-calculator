@@ -10,6 +10,8 @@ A free calculator for real estate investors, with a Rental tab and a Fix & Flip 
 
 **Fix & Flip tab:** enter the purchase price, rehab budget and after-repair value (ARV) to see net profit after buying, loan, holding and selling costs, plus ROI, profit margin and the maximum offer for a target profit or the 70% rule.
 
+**Guide tab:** investor rules of thumb (1% rule, 50% rule, 70% rule, cap rate, cash-on-cash, DSCR), formulas, a due diligence checklist, Pennsylvania notes and a worked example. Both calculators also grade each deal against these rules as you type.
+
 ## Install it as an app
 
 **iPhone / iPad:** open the link in Safari, tap Share, then **Add to Home Screen**.

@@ -79,6 +79,44 @@ tr:last-child td{border-bottom:0;font-weight:600}
 .answer{font:800 30px var(--display);color:var(--brick);font-variant-numeric:tabular-nums}
 .answers .answer{font-size:26px}
 .fine{font-size:13px;color:var(--muted);margin:6px 0 0}
+.tabs{flex-wrap:wrap}
+.checks{display:grid}
+.chk{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:start;padding:9px 0;border-bottom:1px solid var(--line)}
+.chk:last-child{border-bottom:0}
+.dot{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font:700 13px var(--body);margin-top:1px}
+.dot.good{background:var(--good-soft);color:var(--good)} .dot.warn{background:var(--warn-soft);color:var(--warn)} .dot.bad{background:var(--bad-soft);color:var(--bad)}
+.chk b{display:block;font-weight:600;font-size:15px}
+.chk small{display:block;color:var(--muted);font-size:13px;line-height:1.4}
+.chk .val{font:500 15px var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.score{font-size:14px;color:var(--muted);margin:-4px 0 6px}
+.link{background:none;border:0;padding:0;color:var(--brick);font:600 14px var(--body);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.link:focus-visible,.gnav button:focus-visible{outline:2px solid var(--brick);outline-offset:2px}
+.guide{display:grid;grid-template-columns:190px minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:820px){.guide{grid-template-columns:1fr}}
+.gnav{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);display:grid;gap:2px}
+@media (max-width:820px){.gnav{position:static;display:flex;flex-wrap:wrap;gap:6px}}
+.gnav button{text-align:left;background:none;border:0;border-left:2px solid var(--line);padding:6px 12px;color:var(--muted);font:600 14px var(--body);cursor:pointer}
+.gnav button:hover{color:var(--brick);border-left-color:var(--brick)}
+@media (max-width:820px){.gnav button{border:1px solid var(--line);border-radius:99px;background:var(--surface);padding:5px 12px}}
+.gbody{display:grid;gap:22px;min-width:0}
+.gsec{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px 22px;scroll-margin-top:16px;min-width:0}
+.gsec h2{font:800 24px/1.15 var(--display);margin:0 0 4px;text-wrap:balance}
+.gsec h3{font:700 17px var(--display);margin:20px 0 6px;color:var(--brick)}
+.gsec p,.gsec li{max-width:70ch}
+.gsec p{margin:6px 0}
+.gsec ul{margin:6px 0;padding-left:20px;display:grid;gap:5px}
+.gsec .lead{color:var(--muted);margin:0 0 6px}
+.ex{background:var(--brick-soft);border-radius:10px;padding:12px 14px;margin:12px 0;font-size:15px;max-width:70ch}
+.ex>b:first-child{display:block;font:600 12px var(--body);text-transform:uppercase;letter-spacing:.09em;color:var(--brick);margin-bottom:4px}
+.formula{font:500 14px var(--mono);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+.scroll{overflow-x:auto}
+.gtable{border-collapse:collapse;width:100%;min-width:480px;font-size:15px;margin-top:8px}
+.gtable th{text-align:left;font:600 12px var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:8px 12px 8px 0;border-bottom:1px solid var(--line)}
+.gtable td,.gtable td:last-child{text-align:left;font-family:var(--body);padding:8px 12px 8px 0;vertical-align:top;border-bottom:1px solid var(--line)}
+.gtable tr:last-child td{font-weight:400;border-bottom:0}
+.gtable tr td:first-child{font-weight:600}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:4px 24px}
+.cols>div{min-width:0}
 footer{margin-top:28px;font-size:13px;color:var(--muted);max-width:75ch}
 </style>
 </head>
@@ -95,6 +133,7 @@ footer{margin-top:28px;font-size:13px;color:var(--muted);max-width:75ch}
   <div class="tabs" role="tablist" aria-label="Deal type">
     <button class="tab" role="tab" id="tab-rental" aria-controls="rental" aria-selected="true" type="button">Rental</button>
     <button class="tab" role="tab" id="tab-flip" aria-controls="flip" aria-selected="false" type="button">Fix &amp; Flip</button>
+    <button class="tab" role="tab" id="tab-guide" aria-controls="guide" aria-selected="false" type="button">Guide</button>
   </div>
 
   <!-- ===================== RENTAL ===================== -->
@@ -146,6 +185,12 @@ footer{margin-top:28px;font-size:13px;color:var(--muted);max-width:75ch}
         <div class="m"><span class="k">Cash needed</span><b id="cash"></b></div>
         <div class="m"><span class="k">Mortgage / mo</span><b id="pi"></b></div>
         <div class="m"><span class="k">NOI / year</span><b id="noi"></b></div>
+      </div>
+      <div class="panel">
+        <h2>Investor rule checks</h2>
+        <p class="score" id="r_score"></p>
+        <div class="checks" id="r_checks"></div>
+        <p class="fine">Rules of thumb, not guarantees. <button class="link" type="button" data-goto="g-rental">Read the rental rules</button></p>
       </div>
       <div class="panel">
         <h2>Where the rent goes</h2>
@@ -215,6 +260,12 @@ footer{margin-top:28px;font-size:13px;color:var(--muted);max-width:75ch}
         <div class="m"><span class="k">All-in cost</span><b id="f_total"></b></div>
       </div>
       <div class="panel">
+        <h2>Investor rule checks</h2>
+        <p class="score" id="f_score"></p>
+        <div class="checks" id="f_checks"></div>
+        <p class="fine">Rules of thumb, not guarantees. <button class="link" type="button" data-goto="g-flip">Read the fix &amp; flip rules</button></p>
+      </div>
+      <div class="panel">
         <h2>Where the sale price goes</h2>
         <div class="bar" id="f_bar"></div>
         <table id="f_breakdown"></table>
@@ -231,6 +282,236 @@ footer{margin-top:28px;font-size:13px;color:var(--muted);max-width:75ch}
         <p class="fine">"For your target" uses every cost above. The 70% rule is the quick investor shortcut: 70% of ARV minus rehab.</p>
       </div>
     </aside>
+  </div>
+  </section>
+
+  <!-- ===================== GUIDE ===================== -->
+  <section id="guide" role="tabpanel" aria-labelledby="tab-guide" hidden>
+  <div class="guide">
+    <nav class="gnav" aria-label="Guide sections">
+      <button type="button" data-goto="g-glance">At a glance</button>
+      <button type="button" data-goto="g-rental">Rental rules</button>
+      <button type="button" data-goto="g-flip">Fix &amp; flip rules</button>
+      <button type="button" data-goto="g-compare">Rental vs. flip</button>
+      <button type="button" data-goto="g-formulas">Formulas</button>
+      <button type="button" data-goto="g-checklist">Due diligence</button>
+      <button type="button" data-goto="g-pa">Pennsylvania notes</button>
+      <button type="button" data-goto="g-example">Worked example</button>
+    </nav>
+
+    <div class="gbody">
+
+      <article class="gsec" id="g-glance">
+        <h2>The rules at a glance</h2>
+        <p class="lead">Quick filters for deciding which deals deserve a closer look. Confirm every deal with the full numbers in the calculator.</p>
+        <div class="scroll"><table class="gtable">
+          <thead><tr><th>Rule</th><th>Rental target</th><th>Fix &amp; flip target</th></tr></thead>
+          <tbody>
+            <tr><td>Price screen</td><td>Rent ≥ 1% of price (1.2–1.5% safer at today's rates)</td><td>Price ≤ 70% of ARV − rehab</td></tr>
+            <tr><td>Profit</td><td>$100–$300+ cash flow per door per month</td><td>$25,000+ net, or 10–15% of ARV</td></tr>
+            <tr><td>Return on your cash</td><td>Cash-on-cash 8–12%+</td><td>ROI 20%+</td></tr>
+            <tr><td>Other metrics</td><td>Cap rate 6–8%+, DSCR 1.2–1.25+</td><td>Done and sold in 4–6 months</td></tr>
+            <tr><td>Cushion</td><td>Vacancy 5–8%, repairs 5–10%, capital 5–10%</td><td>Rehab contingency 10–20%</td></tr>
+            <tr><td>Expenses</td><td>About 50% of rent goes to non-mortgage costs</td><td>Holding ≈ 1–2% of price per month; selling ≈ 6–10% of sale</td></tr>
+          </tbody>
+        </table></div>
+      </article>
+
+      <article class="gsec" id="g-rental">
+        <h2>Buying to rent out</h2>
+        <p class="lead">A long-term play. You profit a little every month, plus loan paydown and appreciation over time.</p>
+
+        <h3>Screening rules</h3>
+        <ul>
+          <li><b>1% rule.</b> Monthly rent should be at least 1% of the purchase price. A $200,000 house should rent for $2,000 or more. With mortgage rates around 7%, hitting exactly 1% often only breaks even, so many investors look for 1.2–1.5%.</li>
+          <li><b>50% rule.</b> Expect about half the rent to go to expenses other than the mortgage: taxes, insurance, repairs, vacancy, capital reserves and management. The other half has to cover the mortgage and your profit.</li>
+          <li><b>Cash flow minimum.</b> Many investors want at least $100–$300 per door per month after every expense and reserve. Aiming for $500 is the conservative, safer end.</li>
+        </ul>
+
+        <h3>Return targets</h3>
+        <ul>
+          <li><b>Cap rate 6–8%+</b> in most markets. Higher usually means more risk or a rougher area.</li>
+          <li><b>Cash-on-cash return 8–12%+</b> on the money you actually put in.</li>
+          <li><b>DSCR 1.2–1.25+.</b> Net operating income should be at least 1.2–1.25 times the mortgage payment. Many investor loans require this.</li>
+        </ul>
+
+        <h3>Monthly expenses to budget</h3>
+        <ul>
+          <li><b>Vacancy:</b> 5–8% of rent</li>
+          <li><b>Repairs:</b> 5–10% of rent</li>
+          <li><b>Capital reserves</b> (roof, furnace, water heater): 5–10% of rent</li>
+          <li><b>Property management:</b> 8–10% of rent plus leasing fees. Run the numbers with it even if you plan to self-manage.</li>
+          <li><b>Landlord insurance,</b> property taxes, any utilities you pay (water, sewer and trash are common in multi-family), HOA and rental license fees.</li>
+        </ul>
+
+        <h3>Habits that protect you</h3>
+        <ul>
+          <li>Base rent on actual comparable rentals (Zillow, Rentometer, local listings, property managers), not the seller's numbers.</li>
+          <li>Always budget reserves, even if the house is in great shape.</li>
+          <li>Keep 3–6 months of expenses per property in cash.</li>
+          <li>Buy where tenants want to live: near jobs, hospitals, transit and decent schools.</li>
+          <li>Make your profit when you buy, by paying the right price. Don't count on appreciation to rescue a deal that loses money each month.</li>
+        </ul>
+        <div class="ex"><b>Example</b>A $190,000 house renting for $2,500 passes the 1% rule at 1.32%. With 25% down at 8%, the mortgage is about $1,046. Taxes, insurance and reserves bring total costs to about $1,950, leaving roughly $550 a month in cash flow.</div>
+        <button class="link" type="button" id="go-rental">Open the Rental calculator</button>
+      </article>
+
+      <article class="gsec" id="g-flip">
+        <h2>Fix and flip</h2>
+        <p class="lead">A short-term play. You profit once, when the house sells. Speed and accurate budgets matter most.</p>
+
+        <h3>The 70% rule</h3>
+        <p><span class="formula">Maximum offer = (ARV × 70%) − rehab cost</span></p>
+        <p>ARV is the after-repair value, what the house will sell for once it's fixed up. The 30% cushion covers closing costs, loan costs, holding costs, selling costs and your profit. In expensive or very competitive markets some flippers stretch to 75–80%, which leaves a thinner margin. In a slowing market, stick to 70% or lower.</p>
+        <div class="ex"><b>Example</b>ARV $260,000 and rehab $45,000: $260,000 × 70% = $182,000, minus $45,000 = a <b>$137,000</b> maximum offer.</div>
+
+        <h3>Profit targets</h3>
+        <ul>
+          <li><b>At least 10–15% of the ARV,</b> or about $25,000–$30,000 net per flip. Less than that can disappear with one surprise.</li>
+          <li><b>20%+ return</b> on the cash you put in.</li>
+        </ul>
+
+        <h3>Budget rules</h3>
+        <ul>
+          <li><b>Rehab contingency of 10–20%.</b> Older homes, common across the Lehigh Valley, often hide knob-and-tube wiring, old plumbing, foundation issues, asbestos or lead paint.</li>
+          <li><b>Holding costs</b> of about 1–2% of the purchase price per month: loan interest, taxes, insurance and utilities. Every extra month eats profit.</li>
+          <li><b>Selling costs</b> of about 6–10% of the sale price: agent commissions, transfer tax and seller concessions.</li>
+          <li><b>Buying costs</b> of about 2–4% of the purchase price, plus loan points (often 1–3% on hard-money loans).</li>
+        </ul>
+
+        <h3>Habits that protect you</h3>
+        <ul>
+          <li>Base the ARV on homes that <b>actually sold</b> within about half a mile in the last 3–6 months. Ignore list prices.</li>
+          <li>Get contractor bids and a professional inspection <b>before</b> you buy.</li>
+          <li>Don't over-improve. Finish to the neighborhood's level. Kitchens, bathrooms, paint, flooring and curb appeal pay back best.</li>
+          <li>Watch the clock. Most profitable flips are finished and sold within 4–6 months.</li>
+          <li>Have a backup plan. Know what the house would rent for, so you can hold it as a rental if it doesn't sell.</li>
+        </ul>
+        <button class="link" type="button" id="go-flip">Open the Fix &amp; Flip calculator</button>
+      </article>
+
+      <article class="gsec" id="g-compare">
+        <h2>Rental vs. flip</h2>
+        <div class="scroll"><table class="gtable">
+          <thead><tr><th></th><th>Rental</th><th>Fix &amp; flip</th></tr></thead>
+          <tbody>
+            <tr><td>How you profit</td><td>Monthly cash flow, loan paydown, appreciation</td><td>One lump sum at the sale</td></tr>
+            <tr><td>Time frame</td><td>Years</td><td>Months</td></tr>
+            <tr><td>Biggest risks</td><td>Bad tenants, vacancy, underestimated expenses</td><td>Rehab overruns, delays, a wrong ARV</td></tr>
+            <tr><td>Typical loan</td><td>30-year investment mortgage, 20–25% down</td><td>Short-term hard-money or private loan, or cash</td></tr>
+            <tr><td>Taxes</td><td>Depreciation and long-term capital gains can help</td><td>Profit is usually taxed as ordinary income</td></tr>
+          </tbody>
+        </table></div>
+        <h3>The BRRRR method</h3>
+        <p>Many investors combine both strategies: <b>Buy</b> a distressed house, <b>Rehab</b> it, <b>Rent</b> it out, <b>Refinance</b> based on the new value to pull most of your cash back out, then <b>Repeat</b> with the next property. Use the Fix &amp; Flip tab to check the rehab, then the Rental tab to check the rent.</p>
+      </article>
+
+      <article class="gsec" id="g-formulas">
+        <h2>Key formulas</h2>
+        <div class="scroll"><table class="gtable">
+          <thead><tr><th>Term</th><th>Formula</th><th>What it tells you</th></tr></thead>
+          <tbody>
+            <tr><td>Monthly cash flow</td><td><span class="formula">Rent − all expenses − mortgage</span></td><td>Your actual monthly profit</td></tr>
+            <tr><td>NOI</td><td><span class="formula">Yearly income − yearly expenses</span> (no mortgage)</td><td>What the property earns on its own</td></tr>
+            <tr><td>Cap rate</td><td><span class="formula">NOI ÷ price</span></td><td>Compares deals regardless of financing</td></tr>
+            <tr><td>Cash-on-cash</td><td><span class="formula">Yearly cash flow ÷ cash invested</span></td><td>Return on your own money</td></tr>
+            <tr><td>DSCR</td><td><span class="formula">NOI ÷ yearly mortgage payments</span></td><td>How safely income covers the loan</td></tr>
+            <tr><td>Cash invested</td><td><span class="formula">Down payment + closing costs + rehab</span></td><td>What you need to bring</td></tr>
+            <tr><td>ARV</td><td>Sold prices of comparable fixed-up homes</td><td>What a flip will sell for</td></tr>
+            <tr><td>Max offer (flip)</td><td><span class="formula">ARV × 70% − rehab</span></td><td>The most to pay for a flip</td></tr>
+            <tr><td>Flip profit</td><td><span class="formula">Sale price − purchase − rehab − buying, loan, holding and selling costs</span></td><td>What you keep</td></tr>
+            <tr><td>Flip ROI</td><td><span class="formula">Profit ÷ cash invested</span></td><td>Return on your own money</td></tr>
+            <tr><td>Annualized ROI</td><td><span class="formula">ROI × 12 ÷ months held</span></td><td>Compares short flips to yearly returns</td></tr>
+          </tbody>
+        </table></div>
+      </article>
+
+      <article class="gsec" id="g-checklist">
+        <h2>Due diligence checklist</h2>
+        <p class="lead">What to gather before making an offer.</p>
+        <div class="cols">
+          <div>
+            <h3>Income</h3>
+            <ul>
+              <li>Market rent from comparable units</li>
+              <li>Current leases, rent roll, deposits held and payment history</li>
+              <li>Other income: parking, laundry, storage</li>
+            </ul>
+            <h3>Expenses</h3>
+            <ul>
+              <li>The actual property tax bill</li>
+              <li>A landlord insurance quote</li>
+              <li>Utilities the owner pays</li>
+              <li>Rental license and inspection fees</li>
+              <li>HOA dues, if any</li>
+            </ul>
+            <h3>Financing</h3>
+            <ul>
+              <li>Investment-loan rate (usually 0.5–1 point above owner-occupied)</li>
+              <li>Down payment, closing costs and transfer tax</li>
+              <li>Points and terms for hard-money loans</li>
+            </ul>
+          </div>
+          <div>
+            <h3>The property</h3>
+            <ul>
+              <li>Age of the roof, furnace or boiler, water heater, electrical panel, plumbing and windows</li>
+              <li>Professional inspection, sewer scope and radon test</li>
+              <li>Lead paint disclosure for homes built before 1978</li>
+              <li>Legal unit count, zoning and permits</li>
+              <li>Open permits or code violations</li>
+              <li>Flood zone, oil tank, septic or well issues</li>
+            </ul>
+            <h3>The location</h3>
+            <ul>
+              <li>Rental vacancy and days on market</li>
+              <li>Who rents there: students, families, workers</li>
+              <li>Crime, school district, jobs and transit</li>
+              <li>New development or supply coming</li>
+            </ul>
+            <h3>Your exit</h3>
+            <ul>
+              <li>Appreciation trends in the area</li>
+              <li>Tax benefits (ask a CPA)</li>
+              <li>Whether you could sell, refinance or rent it instead</li>
+            </ul>
+          </div>
+        </div>
+      </article>
+
+      <article class="gsec" id="g-pa">
+        <h2>Pennsylvania notes</h2>
+        <p class="lead">State rules and local quirks that affect the numbers. Confirm details with a PA real estate attorney or accountant.</p>
+        <ul>
+          <li><b>Property taxes</b> combine county, municipal and school district taxes. The school tax is usually the largest piece. Allentown-area taxes are fairly heavy, often around 2–2.5% of value per year.</li>
+          <li><b>Realty transfer tax</b> is 1% to the state plus a local share, which is higher in some cities. It's usually split between buyer and seller.</li>
+          <li><b>Reassessment risk.</b> A high sale price can lead the school district to appeal your assessment and raise your taxes. Some districts do this actively.</li>
+          <li><b>Security deposits</b> (Landlord and Tenant Act of 1951) are capped at 2 months' rent in the first year and 1 month after that. Deposits over $100 held more than 2 years must earn interest, and unused deposits must be returned within 30 days.</li>
+          <li><b>Evictions</b> go through the local magisterial district judge.</li>
+          <li><b>Rental licensing and inspections</b> are required in Allentown, Bethlehem, Reading, Philadelphia and many other towns.</li>
+          <li><b>Older housing stock.</b> Radon is common in eastern PA, and pre-1978 homes need lead disclosures. Some cities also have lead-safe rental rules.</li>
+          <li><b>LLC or not.</b> Whether to hold properties in an LLC is a question for a PA attorney and your accountant.</li>
+        </ul>
+      </article>
+
+      <article class="gsec" id="g-example">
+        <h2>Worked example: what should I pay?</h2>
+        <p class="lead">Rent is $2,500 a month and the goal is at least $500 a month in cash flow, in Allentown at an 8% investment-loan rate with 25% down.</p>
+        <div class="scroll"><table class="gtable">
+          <thead><tr><th>Step</th><th>Monthly amount</th></tr></thead>
+          <tbody>
+            <tr><td>Rent</td><td>$2,500</td></tr>
+            <tr><td>Minus your $500 target</td><td>$2,000 left for all costs</td></tr>
+            <tr><td>Minus vacancy (6%), repairs and capital (10%), insurance</td><td>About $525 → $1,475 left</td></tr>
+            <tr><td>Optional: minus management (10%)</td><td>$250 → $1,225 left</td></tr>
+            <tr><td>Mortgage + taxes cost</td><td>About $760 per $100,000 of price</td></tr>
+          </tbody>
+        </table></div>
+        <div class="ex"><b>Answer</b>About <b>$194,000</b> if you manage it yourself ($1,475 ÷ $760 × $100,000), or about <b>$161,000</b> with a property manager. The Rental tab's "Maximum offer price" box does this math for any deal.</div>
+        <p class="fine">These are general guidelines and estimates, not financial or legal advice.</p>
+      </article>
+
+    </div>
   </div>
   </section>
 
@@ -276,6 +557,7 @@ function renderRental(){
   const tr=v.price?v.taxes/v.price:0;
   const mp=bisect(p=>rental({...v,price:p,taxes:tr*p}).cf-v.target);
   $("maxp").textContent=mp===null?"Not reachable at this rent":usd(mp);
+  drawChecks("r_checks","r_score",rentalChecks(v,r));
 }
 
 /* ---------- Fix & Flip ---------- */
@@ -302,6 +584,45 @@ function renderFlip(){
   const mp=bisect(p=>flip({...v,f_price:p}).profit-v.f_target);
   $("f_maxp").textContent=mp===null?"Not reachable":usd(mp);
   const mao=v.f_arv*0.7-v.f_rehab; $("f_mao70").textContent=mao>0?usd(Math.floor(mao/1000)*1000):"Not reachable";
+  drawChecks("f_checks","f_score",flipChecks(v,r));
+}
+
+/* ---------- Rule checks ---------- */
+function grade(v,good,ok,higher=true){ if(!isFinite(v))return"bad"; return higher?(v>=good?"good":v>=ok?"warn":"bad"):(v<=good?"good":v<=ok?"warn":"bad"); }
+const ICON={good:"✓",warn:"!",bad:"✕"}, WORD={good:"Passes",warn:"Borderline",bad:"Fails"};
+function drawChecks(listId,scoreId,items){
+  $(listId).innerHTML=items.map(c=>`<div class="chk"><span class="dot ${c.g}" role="img" aria-label="${WORD[c.g]}">${ICON[c.g]}</span><div><b>${c.name}</b><small>${c.note}</small></div><span class="val">${c.val}</span></div>`).join("");
+  const pass=items.filter(c=>c.g==="good").length, warn=items.filter(c=>c.g==="warn").length;
+  $(scoreId).textContent=`Passes ${pass} of ${items.length} rules`+(warn?` · ${warn} borderline`:"");
+}
+function rentalChecks(v,r){
+  const onePct=v.price?v.rent/v.price*100:NaN;
+  const fifty=v.rent*0.5-r.pi;
+  const opex=r.parts.slice(1).reduce((a,p)=>a+p[1],0);
+  const opexPct=r.income?opex/r.income*100:NaN;
+  const dscr=r.pi>0?(r.noi/12)/r.pi:Infinity;
+  const reserves=v.vac+v.rep+v.capex;
+  return[
+    {name:"1% rule",note:"Monthly rent ÷ price should be 1% or more. At today's rates, 1.2%+ is safer.",val:isFinite(onePct)?onePct.toFixed(2)+"%":"—",g:grade(onePct,1,0.8)},
+    {name:"50% rule cash flow",note:`Half the rent (${usd(v.rent*0.5)}) minus the mortgage. A quick check that the deal works with conservative expenses.`,val:usd(fifty),g:grade(fifty,100,0)},
+    {name:"Realistic expense estimate",note:"Non-mortgage expenses usually run 35–50% of rent. Lower often means something was left out.",val:pct(opexPct),g:grade(opexPct,35,25)},
+    {name:"Cap rate 6%+",note:"Net operating income ÷ price.",val:pct(r.cap),g:grade(r.cap,6,5)},
+    {name:"Cash-on-cash 8%+",note:"Yearly cash flow ÷ the cash you put in.",val:pct(r.coc),g:grade(r.coc,8,5)},
+    {name:"DSCR 1.25+",note:"Net operating income ÷ mortgage. Many investor loans require 1.2–1.25.",val:isFinite(dscr)?dscr.toFixed(2):"No loan",g:isFinite(dscr)?grade(dscr,1.25,1):"good"},
+    {name:"Reserves 15%+ of rent",note:"Vacancy + repairs + capital reserves combined.",val:pct(reserves),g:grade(reserves,15,10)}
+  ];
+}
+function flipChecks(v,r){
+  const mao=v.f_arv*0.7-v.f_rehab, mao75=v.f_arv*0.75-v.f_rehab;
+  const ofArv=v.f_arv?r.profit/v.f_arv*100:NaN;
+  return[
+    {name:"70% rule",note:`Max offer = 70% of ARV − rehab = ${usd(mao)}. Your price is ${v.f_price<=mao?"at or under":"over"} it.`,val:usd(v.f_price),g:v.f_price<=mao?"good":v.f_price<=mao75?"warn":"bad"},
+    {name:"Profit 10%+ of ARV",note:"Most flippers want 10–15% of the sale price as net profit.",val:pct(ofArv),g:grade(ofArv,10,5)},
+    {name:"Profit $25,000+",note:"A cushion big enough to survive one surprise.",val:usd(r.profit),g:grade(r.profit,25000,15000)},
+    {name:"ROI on cash 20%+",note:"Net profit ÷ the cash you put in.",val:pct(r.roi),g:grade(r.roi,20,10)},
+    {name:"Rehab contingency 10%+",note:"Older homes hide problems. 10–20% is standard.",val:pct(v.f_cont),g:grade(v.f_cont,10,5)},
+    {name:"Finished in 6 months or less",note:"Every extra month adds interest, taxes and utilities.",val:v.f_months+" mo",g:grade(v.f_months,6,9,false)}
+  ];
 }
 
 /* ---------- Shared: storage, tabs, events ---------- */
@@ -313,19 +634,27 @@ function render(){renderRental();renderFlip();save();}
 
 const TEXT={
   rental:['Rental Deal <span>Calculator</span>','Enter a property\'s numbers to see monthly cash flow, cap rate and cash-on-cash return. Figures below are an example, not a real listing.'],
-  flip:['Fix &amp; Flip <span>Calculator</span>','Enter the purchase, rehab and resale numbers to see your profit after every cost. Figures below are an example, not a real listing.']
+  flip:['Fix &amp; Flip <span>Calculator</span>','Enter the purchase, rehab and resale numbers to see your profit after every cost. Figures below are an example, not a real listing.'],
+  guide:['Investor <span>Guide</span>','Rules of thumb, formulas and checklists for buying rentals and flipping houses, with Pennsylvania notes.']
 };
+const MODES=["rental","flip","guide"];
 let mode="rental";
 function setMode(m,focus){
   mode=m;
-  ["rental","flip"].forEach(x=>{$(x).hidden=x!==m;$("tab-"+x).setAttribute("aria-selected",x===m);$("tab-"+x).tabIndex=x===m?0:-1});
+  MODES.forEach(x=>{$(x).hidden=x!==m;$("tab-"+x).setAttribute("aria-selected",x===m);$("tab-"+x).tabIndex=x===m?0:-1});
   $("heading").innerHTML=TEXT[m][0];$("subtitle").textContent=TEXT[m][1];
+  $("reset").hidden=m==="guide";
   if(focus)$("tab-"+m).focus();
   try{localStorage.setItem("rdc_mode",m)}catch(e){}
 }
 $("tab-rental").addEventListener("click",()=>setMode("rental"));
 $("tab-flip").addEventListener("click",()=>setMode("flip"));
-document.querySelector(".tabs").addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key==="ArrowLeft"){setMode(mode==="rental"?"flip":"rental",true);e.preventDefault()}});
+$("tab-guide").addEventListener("click",()=>setMode("guide"));
+const smooth=()=>matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth";
+document.addEventListener("click",e=>{const b=e.target.closest("[data-goto]");if(!b)return;const id=b.dataset.goto;if(mode!=="guide")setMode("guide");requestAnimationFrame(()=>$(id).scrollIntoView({behavior:smooth(),block:"start"}));});
+$("go-rental").addEventListener("click",()=>{setMode("rental");scrollTo({top:0,behavior:smooth()})});
+$("go-flip").addEventListener("click",()=>{setMode("flip");scrollTo({top:0,behavior:smooth()})});
+document.querySelector(".tabs").addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key==="ArrowLeft"){const i=MODES.indexOf(mode),d=e.key==="ArrowRight"?1:-1;setMode(MODES[(i+d+MODES.length)%MODES.length],true);e.preventDefault()}});
 document.querySelectorAll("form").forEach(f=>{f.addEventListener("input",render);f.addEventListener("submit",e=>e.preventDefault())});
 document.querySelectorAll(".solve input").forEach(el=>el.addEventListener("input",render));
 document.querySelectorAll("input").forEach(el=>el.addEventListener("blur",()=>{el.value=num(el.id).toLocaleString("en-US")}));
@@ -333,9 +662,9 @@ $("reset").addEventListener("click",()=>{const d=mode==="rental"?R_DEF:F_DEF;for
 
 load();
 let startMode="rental";
-if(location.hash==="#flip")startMode="flip";
+if(location.hash==="#flip"||location.hash==="#guide")startMode=location.hash.slice(1);
 else{try{startMode=localStorage.getItem("rdc_mode")||"rental"}catch(e){}}
-setMode(startMode==="flip"?"flip":"rental");
+setMode(MODES.includes(startMode)?startMode:"rental");
 render();
 </script>
 <script>
